@@ -24,7 +24,7 @@ helm repo update
 
 ### Configure the chart
 
-The following items can be set via `--set` flag during installation or configured by editing the [`values.yaml`](values.yaml) file directly (need to download the chart first).
+The following items can be set via `--set` flag during installation or configured by editing the [`values.yaml`](charts/nifi/values.yaml) file directly (need to download the chart first).
 
 #### Configure how to expose nifi service
 
