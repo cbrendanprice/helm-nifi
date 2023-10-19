@@ -75,6 +75,8 @@ sts:
 properties:
   # https://nifi.apache.org/docs/nifi-docs/html/administration-guide.html#nifi_sensitive_props_key
   sensitiveKey: changeMechangeMe # Must have at least 12 characters
+  sensitiveKeyExistingSecret: ""
+  sensitiveKeyExistingSecretKeyName: "sensitiveKey"
   # NiFi assumes conf/nifi.properties is persistent but this helm chart
   # recreates it every time.  Setting the Sensitive Properties Key
   # (nifi.sensitive.props.key) is supposed to happen at the same time
@@ -91,7 +93,11 @@ properties:
   # use externalSecure for when inbound SSL is provided by nginx-ingress or other external mechanism
   externalSecure: false
   isNode: false
-  httpsPort: 8443
+  httpPort: 8443
+  httpProtocol: "https"
+  # http/s hosts are ignored if cert manager is enabled
+  webHttpHost: ""
+  webHttpsHost: ""
   webProxyHost: # <clusterIP>:<NodePort> (If Nifi service is NodePort or LoadBalancer)
   clusterPort: 6007
   provenanceStorage: "8 GB"
@@ -124,6 +130,7 @@ auth:
   singleUser:
     username: username
     password: changemechangeme # Must to have at least 12 characters
+    existingSecret: ""
 
   clientAuth:
     enabled: false
@@ -149,7 +156,7 @@ auth:
     clientSecret: #<client_secret_in_oidc_provider>
     claimIdentifyingUser: email
     admin: nifi@example.com
-    preferredJwsAlgorithm: 
+    preferredJwsAlgorithm:
     ## Request additional scopes, for example profile
     additionalScopes:
 
@@ -183,7 +190,7 @@ headless:
 # ui service
 service:
   type: ClusterIP
-  httpsPort: 8443
+  httpPort: 8443
   # nodePort: 30236
   annotations: {}
     # loadBalancerIP:
@@ -210,11 +217,11 @@ service:
         port: 7002
         targetPort: 7002
         #nodePort: 30702
-## Configure containerPorts section with following attributes: name, containerport and protocol. 
+## Configure containerPorts section with following attributes: name, containerport and protocol.
 containerPorts: []
 # - name: example
 #   containerPort: 1111
-#   protocol: TCP 
+#   protocol: TCP
 
 ## Configure Ingress based on the documentation here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ##
@@ -226,6 +233,9 @@ ingress:
   hosts: []
   path: /
   # If you want to change the default path, see this issue https://github.com/cetic/helm-nifi/issues/22
+
+istioCompatibility:
+  enabled: false
 
 # Amount of memory to give the NiFi java heap
 jvmMemory: 2g
@@ -253,7 +263,7 @@ persistence:
   #
   # The default storage class is used if this variable is not set.
 
-  accessModes:  [ReadWriteOnce]
+  accessModes: [ReadWriteOnce]
 
   ## Use subPath and have 1 persistent volume instead of 7 volumes - use when your k8s nodes have limited volume slots, to limit waste of space,
   ##  or your available volume sizes are quite large

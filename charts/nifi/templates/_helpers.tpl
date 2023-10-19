@@ -24,6 +24,18 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 {{- end -}}
 
+
+{{/*
+Returns the appropriate port name based on provided configuraiton.
+*/}}
+{{- define "apache-nifi.urlScheme" }}
+{{- if or .Values.istioCompatibility.enabled (and (not .Values.certManager.enabled) (eq (( .Values.properties.httpProtocol | trim ) | default "https") "http")) }}
+{{- printf "http" }}
+{{- else}}
+{{- printf "https" }}
+{{- end}}
+{{- end }}
+
 {{/*
 Create chart name and version as used by the chart label.
 */}}
