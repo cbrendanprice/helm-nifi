@@ -5,7 +5,7 @@ metadata:
   name: {{ template "apache-nifi.fullname" . }}-headless
   labels:
     app: {{ include "apache-nifi.name" . | quote }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name | quote }}
     heritage: {{ .Release.Service | quote }}
 {{- if .Values.headless.annotations }}
@@ -16,8 +16,8 @@ spec:
   type: {{ .Values.headless.type }}
   clusterIP: None
   ports:
-  - port: {{ .Values.properties.httpsPort }}
-    name: https
+  - port: {{ .Values.properties.httpPort }}
+    name: {{ template "apache-nifi.urlScheme" . }}
   - port: {{ .Values.properties.clusterPort }}
     name: cluster
   - port: {{ .Values.properties.siteToSite.port }}
@@ -32,7 +32,7 @@ metadata:
   name: {{ template "apache-nifi.fullname" . }}
   labels:
     app: {{ include "apache-nifi.name" . | quote }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name | quote }}
     heritage: {{ .Release.Service | quote }}
 {{- if .Values.service.annotations }}
@@ -60,9 +60,9 @@ spec:
   {{- end }}
   {{- end }}
   ports:
-    - port: {{ .Values.service.httpsPort }}
-      name: https
-      targetPort: {{ .Values.properties.httpsPort }}
+    - port: {{ .Values.service.httpPort }}
+      name: {{ template "apache-nifi.urlScheme" . }}
+      targetPort: {{ .Values.properties.httpPort }}
       nodePort: {{ .Values.service.nodePort }}
     - port: {{ .Values.properties.siteToSite.port }}
       name: site-to-site
@@ -93,7 +93,7 @@ metadata:
   name: {{ template "apache-nifi.fullname" . }}-metrics
   labels:
     app: {{ include "apache-nifi.name" . | quote }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name | quote }}
     heritage: {{ .Release.Service | quote }}
 spec:
