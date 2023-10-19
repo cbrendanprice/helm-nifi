@@ -5,7 +5,7 @@ metadata:
   name: {{ template "apache-nifi.fullname" . }}
   labels:
     app: {{ include "apache-nifi.name" . | quote }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name | quote }}
     heritage: {{ .Release.Service | quote }}
 spec:
@@ -26,7 +26,7 @@ spec:
 {{- end }}
       labels:
         app: {{ include "apache-nifi.name" . | quote }}
-        chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         release: {{ .Release.Name | quote }}
         heritage: {{ .Release.Service | quote }}
 {{- if .Values.extraLabels }}
@@ -179,6 +179,8 @@ spec:
 {{- else if .Values.auth.clientAuth.enabled }}
           cat "${NIFI_HOME}/conf/authorizers.temp" > "${NIFI_HOME}/conf/authorizers.xml"
           xmlstarlet ed --inplace --delete "//authorizers/authorizer[identifier='single-user-authorizer']" "${NIFI_HOME}/conf/authorizers.xml"
+{{- else if .Values.auth.singleUser.existingSecret }}
+          bin/nifi.sh set-single-user-credentials "$(</opt/nifi/secrets/single-user-credentials/username)" "$(</opt/nifi/secrets/single-user-credentials/password)"
 {{- else if .Values.auth.singleUser.username }}
           bin/nifi.sh set-single-user-credentials {{ .Values.auth.singleUser.username }} {{ .Values.auth.singleUser.password }}
 {{- end }}
@@ -278,7 +280,11 @@ spec:
 {{- /* if .Values.properties.sensitiveKeyPrior */}}{{ else }}
             prop_replace nifi.sensitive.props.key ""
 {{- /* if .Values.properties.sensitiveKeyPrior */}}{{ end }}
+{{- if and .Values.properties.sensitiveKeyExistingSecret .Values.properties.sensitiveKeyExistingSecretKeyName }}
+            bin/nifi.sh set-sensitive-properties-key $(cat /opt/nifi/secrets/flow-encryption-key)
+{{- else }}
             bin/nifi.sh set-sensitive-properties-key {{ .Values.properties.sensitiveKey | quote }}
+{{- end }}
             touch {{ .Values.properties.sensitiveKeySetFile | quote }}
           fi
 {{- /* if .Values.properties.sensitiveKeySetFile */}}{{ end }}
@@ -526,6 +532,15 @@ spec:
           - name: "flow-content"
             mountPath: /opt/nifi/data/flow.xml
             subPath: "flow.xml"
+          {{- if and .Values.properties.sensitiveKeyExistingSecret .Values.properties.sensitiveKeyExistingSecretKeyName }}
+          - name: "flow-encryption-key"
+            mountPath: /opt/nifi/secrets/flow-encryption-key
+            subPath: {{ .Values.properties.sensitiveKeyExistingSecretKeyName }}
+          {{- end }}
+          {{- if .Values.auth.singleUser.existingSecret }}
+          - name: "auth-single-user-credentials"
+            mountPath: /opt/nifi/secrets/single-user-credentials
+          {{- end }}
           {{- range $secret := .Values.secrets }}
             {{- if $secret.mountPath }}
               {{- if $secret.keys }}
@@ -795,6 +810,16 @@ spec:
           items:
             - key: "flow.xml"
               path: "flow.xml"
+{{- if and .Values.properties.sensitiveKeyExistingSecret .Values.properties.sensitiveKeyExistingSecretKeyName }}
+      - name: "flow-encryption-key"
+        secret:
+          secretName: {{ .Values.properties.sensitiveKeyExistingSecret }}
+{{- end }}
+{{- if .Values.auth.singleUser.existingSecret }}
+      - name: "auth-single-user-credentials"
+        secret:
+          secretName: {{ .Values.auth.singleUser.existingSecret }}
+{{- end }}
 {{- if .Values.certManager.enabled }}
       - name: secret-reader-token
         secret:
