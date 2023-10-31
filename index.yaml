@@ -1,0 +1,67 @@
+apiVersion: v1
+entries:
+  ca:
+  - apiVersion: v2
+    appVersion: 1.11.4
+    created: "2023-10-31T19:32:31.747196635Z"
+    description: A Helm chart to deploy ca server to generate self-signed certificates
+      using nifi-toolkit.
+    digest: 9cea5e52fa7d1bad41d9cd5a634e7b6f2d3c87158162e0754a016bf11b61438c
+    home: https://nifi.apache.org/
+    icon: https://svn.apache.org/repos/asf/nifi/site/trunk/images/niFi-logo-horizontal-scaled.png
+    keywords:
+    - nifi-toolkit
+    - ca
+    - self-signed certs
+    name: ca
+    urls:
+    - https://github.com/cbrendanprice/helm-nifi/releases/download/ca-1.0.1/ca-1.0.1.tgz
+    version: 1.0.1
+  nifi:
+  - apiVersion: v2
+    appVersion: 1.16.3
+    created: "2023-10-31T19:32:31.921955279Z"
+    dependencies:
+    - condition: zookeeper.enabled
+      name: zookeeper
+      repository: https://charts.bitnami.com/bitnami
+      version: 9.2.7
+    - alias: registry
+      condition: registry.enabled
+      name: nifi-registry
+      repository: https://dysnix.github.io/charts/
+      version: 1.0.0
+    - condition: ca.enabled
+      name: ca
+      repository: file://../ca
+      version: 1.0.1
+    - name: openldap
+      repository: https://charts.helm.sh/stable
+      version: ~1.2.4
+    description: Apache NiFi is a software project from the Apache Software Foundation
+      designed to automate the flow of data between software systems.
+    digest: f9fe9ad03b45d0369ef2d50a765b4b8c44a5512fba998e9317bd834f2b3544f0
+    home: https://nifi.apache.org/
+    icon: https://svn.apache.org/repos/asf/nifi/site/trunk/images/niFi-logo-horizontal-scaled.png
+    keywords:
+    - nifi
+    - data
+    - process
+    maintainers:
+    - email: sebastien.dupont@cetic.be
+      name: banzo
+      url: https://github.com/banzo
+    - email: amen.ayadi@cetic.be
+      name: AyadiAmen
+      url: https://github.com/AyadiAmen
+    - email: alexandre.nuttinck@cetic.be
+      name: alexnuttinck
+      url: https://github.com/alexnuttinck
+    - email: zakaria.hajja@cetic.be
+      name: zakaria2905
+      url: https://github.com/zakaria2905
+    name: nifi
+    urls:
+    - https://github.com/cbrendanprice/helm-nifi/releases/download/nifi-1.1.4/nifi-1.1.4.tgz
+    version: 1.1.4
+generated: "2023-10-31T19:32:31.921968279Z"
