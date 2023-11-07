@@ -20,6 +20,53 @@ entries:
   nifi:
   - apiVersion: v2
     appVersion: 1.16.3
+    created: "2023-11-07T18:06:33.750628165Z"
+    dependencies:
+    - condition: zookeeper.enabled
+      name: zookeeper
+      repository: https://charts.bitnami.com/bitnami
+      version: 9.2.7
+    - alias: registry
+      condition: registry.enabled
+      name: nifi-registry
+      repository: https://dysnix.github.io/charts/
+      version: 1.0.0
+    - condition: ca.enabled
+      name: ca
+      repository: file://../ca
+      version: 1.0.1
+    - condition: openldap.enabled
+      name: openldap
+      repository: https://charts.helm.sh/stable
+      version: ~1.2.4
+    description: Apache NiFi is a software project from the Apache Software Foundation
+      designed to automate the flow of data between software systems.
+    digest: e32541f76383050a9dc012d7c4d92f5629490b9f85b0267cfd026be48076d93b
+    home: https://nifi.apache.org/
+    icon: https://svn.apache.org/repos/asf/nifi/site/trunk/images/niFi-logo-horizontal-scaled.png
+    keywords:
+    - nifi
+    - data
+    - process
+    maintainers:
+    - email: sebastien.dupont@cetic.be
+      name: banzo
+      url: https://github.com/banzo
+    - email: amen.ayadi@cetic.be
+      name: AyadiAmen
+      url: https://github.com/AyadiAmen
+    - email: alexandre.nuttinck@cetic.be
+      name: alexnuttinck
+      url: https://github.com/alexnuttinck
+    - email: zakaria.hajja@cetic.be
+      name: zakaria2905
+      url: https://github.com/zakaria2905
+    name: nifi
+    urls:
+    - https://github.com/cbrendanprice/helm-nifi/releases/download/nifi-1.1.9/nifi-1.1.9.tgz
+    version: 1.1.9
+  - apiVersion: v2
+    appVersion: 1.16.3
     created: "2023-11-03T23:21:45.092098291Z"
     dependencies:
     - condition: zookeeper.enabled
@@ -251,4 +298,4 @@ entries:
     urls:
     - https://github.com/cbrendanprice/helm-nifi/releases/download/nifi-1.1.4/nifi-1.1.4.tgz
     version: 1.1.4
-generated: "2023-11-03T23:21:45.092114772Z"
+generated: "2023-11-07T18:06:33.750653365Z"
